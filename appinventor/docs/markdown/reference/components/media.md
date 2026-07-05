@@ -147,8 +147,14 @@ The <code>FilePicker</code> component is a button-like component that when click
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="FilePicker.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="FilePicker.MimeType" .text} *MimeType*
 : Sets the desired MIME type for picking a file.
+
+{:id="FilePicker.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="FilePicker.Selection" .text .ro .bo} *Selection*
 : Returns the selected file, possibly as a content URI.
@@ -276,6 +282,12 @@ A special-purpose button. When the user taps an `ImagePicker`, the device's imag
 {:id="ImagePicker.Left" .number} *Left*
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
+
+{:id="ImagePicker.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="ImagePicker.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="ImagePicker.Selection" .text .ro .bo} *Selection*
 : Path to the file containing the image that was selected.

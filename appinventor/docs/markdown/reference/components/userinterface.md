@@ -78,6 +78,12 @@ Button with the ability to detect clicks. Many aspects of its appearance can be 
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="Button.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="Button.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="Button.Shape" .number .do} *Shape*
 : Specifies the shape of the `Button`. The valid values for this property are `0` (default),
  `1` (rounded), `2` (rectangle), and `3` (oval). The `Shape` will not be visible if an
@@ -196,6 +202,12 @@ None
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="CheckBox.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="CheckBox.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="CheckBox.Text" .text} *Text*
 : Specifies the text displayed by the `CheckBox`.
 
@@ -260,6 +272,9 @@ Component for CircularProgress
 {:id="CircularProgress.Left" .number} *Left*
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
+
+{:id="CircularProgress.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="CircularProgress.Top" .number} *Top*
 : Specifies the position of the Top edge of the component relative to an
@@ -346,11 +361,17 @@ A button that, when clicked on, launches a popup dialog to allow the user to sel
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="DatePicker.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="DatePicker.Month" .number .ro .bo} *Month*
 : Returns the number of the Month that was last picked using the DatePicker.
 
 {:id="DatePicker.MonthInText" .text .ro .bo} *MonthInText*
 : Returns the name of the Month that was last picked using the DatePicker.
+
+{:id="DatePicker.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="DatePicker.Shape" .number .do} *Shape*
 : Specifies the shape of the `DatePicker`. The valid values for this property are `0` (default),
@@ -463,6 +484,12 @@ Component for displaying images and basic animations.
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="Image.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="Image.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="Image.Picture" .text} *Picture*
 : Specifies the path of the `Image`'s `Picture`.
 
@@ -561,6 +588,12 @@ Labels are components used to show text.
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="Label.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="Label.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="Label.Text" .text} *Text*
 : Specifies the text displayed by the label.
 
@@ -619,6 +652,9 @@ Component for LinearProgress
 {:id="LinearProgress.Left" .number} *Left*
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
+
+{:id="LinearProgress.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="LinearProgress.Maximum" .number} *Maximum*
 : Set the upper range of the progress bar max.
@@ -730,6 +766,12 @@ A button that, when clicked on, displays a list of texts for the user to choose 
 {:id="ListPicker.Left" .number} *Left*
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
+
+{:id="ListPicker.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="ListPicker.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="ListPicker.Selection" .text} *Selection*
 : The selected item. When directly changed by the programmer, the [`SelectionIndex`](#ListPicker.SelectionIndex)
@@ -909,10 +951,16 @@ This is a visible component that displays a list of text and image elements in y
 {:id="ListView.ListViewLayout" .number} *ListViewLayout*
 : Specifies type of layout for ListView row.
 
+{:id="ListView.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="ListView.Orientation" .number} *Orientation*
 : Specifies the layout's orientation. This may be: `Vertical`, which displays elements
  in rows one after the other; or `Horizontal`, which displays one element at a time and
  allows the user to swipe left or right to brows the elements.
+
+{:id="ListView.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="ListView.Selection" .text} *Selection*
 : Returns the text in the `ListView` at the position of [`SelectionIndex`](#ListView.SelectionIndex).
@@ -1147,11 +1195,17 @@ Users enter passwords in a password text box component, which hides the text tha
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="PasswordTextBox.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="PasswordTextBox.NumbersOnly" .boolean} *NumbersOnly*
 : If true, then this `PasswordTextBox`` accepts only numbers as keyboard input. Numbers can include a
  decimal point and an optional leading minus sign. This applies to keyboard input only. Even
  if `NumbersOnly` is true, you can set the text to anything at all using the
  [`Text`](#PasswordTextBox.Text) property.
+
+{:id="PasswordTextBox.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="PasswordTextBox.PasswordVisible" .boolean .bo} *PasswordVisible*
 : Specifies whether the password is hidden (default) or shown.
@@ -1484,6 +1538,9 @@ This class is used to display a `Slider`.
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="Slider.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="Slider.MaxValue" .number} *MaxValue*
 : Sets the maximum value of slider. If the new maximum is less than the
  current minimum, then minimum and maximum will both be set to this value.
@@ -1604,6 +1661,12 @@ A `Spinner` component that displays a dialog with a list of elements. These elem
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="Spinner.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="Spinner.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="Spinner.Prompt" .text} *Prompt*
 : Specifies the text used for the title of the Spinner window.
 
@@ -1711,8 +1774,14 @@ A `Spinner` component that displays a dialog with a list of elements. These elem
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="Switch.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="Switch.On" .boolean} *On*
 : True if the switch is in the On state, false otherwise.
+
+{:id="Switch.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="Switch.Text" .text} *Text*
 : Specifies the text displayed by the `Switch`.
@@ -1838,6 +1907,9 @@ Users enter text in a text box component.
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="TextBox.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="TextBox.MultiLine" .boolean} *MultiLine*
 : If true, then this `TextBox` accepts multiple lines of input, which are entered using the
  return key. For single line text boxes there is a Done key instead of a return key, and
@@ -1849,6 +1921,9 @@ Users enter text in a text box component.
  decimal point and an optional leading minus sign. This applies to keyboard input only. Even
  if `NumbersOnly` is true, you can set the text to anything at all using the
  [`Text`](#TextBox.Text) property.
+
+{:id="TextBox.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="TextBox.ReadOnly" .boolean} *ReadOnly*
 : Whether the TextBox is read-only. By default, this is `false`{:.logic.block}.
@@ -1975,9 +2050,15 @@ A button that, when clicked on, opens a dialog to allow the user to select a tim
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="TimePicker.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="TimePicker.Minute" .number .ro .bo} *Minute*
 : Returns the hour of the time that was last picked using the `TimePicker`.
  The time returned is always in the 24hour format.
+
+{:id="TimePicker.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="TimePicker.Shape" .number .do} *Shape*
 : Specifies the shape of the `TimePicker`. The valid values for this property are `0` (default),

@@ -45,6 +45,12 @@ Container for components that arranges them absolutely.
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="AbsoluteArrangement.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="AbsoluteArrangement.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="AbsoluteArrangement.Top" .number} *Top*
 : Specifies the position of the Top edge of the component relative to an
  AbsoluteArrangement.
@@ -138,6 +144,12 @@ None
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="HorizontalArrangement.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="HorizontalArrangement.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="HorizontalArrangement.Top" .number} *Top*
 : Specifies the position of the Top edge of the component relative to an
  AbsoluteArrangement.
@@ -208,6 +220,12 @@ A formatting element in which to place components that should be displayed from 
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="HorizontalScrollArrangement.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="HorizontalScrollArrangement.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="HorizontalScrollArrangement.Top" .number} *Top*
 : Specifies the position of the Top edge of the component relative to an
  AbsoluteArrangement.
@@ -277,6 +295,12 @@ Use a table arrangement component to display a group of components in a tabular 
 {:id="TableArrangement.Left" .number} *Left*
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
+
+{:id="TableArrangement.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="TableArrangement.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="TableArrangement.Rows" .number .do} *Rows*
 : Determines the number of rows in the table.
@@ -374,6 +398,12 @@ None
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="VerticalArrangement.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="VerticalArrangement.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="VerticalArrangement.Top" .number} *Top*
 : Specifies the position of the Top edge of the component relative to an
  AbsoluteArrangement.
@@ -443,6 +473,12 @@ A formatting element in which to place components that should be displayed one b
 {:id="VerticalScrollArrangement.Left" .number} *Left*
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
+
+{:id="VerticalScrollArrangement.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="VerticalScrollArrangement.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="VerticalScrollArrangement.Top" .number} *Top*
 : Specifies the position of the Top edge of the component relative to an

@@ -73,6 +73,9 @@ The Chart component plots data originating from it's attached Data components. F
 {:id="Chart.LegendEnabled" .boolean} *LegendEnabled*
 : Changes the visibility of the Chart's Legend.
 
+{:id="Chart.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="Chart.PieRadius" .number .wo .do} *PieRadius*
 : Sets the Pie Radius of the Chart. If the current type is
  not the Pie Chart, the value has no effect.

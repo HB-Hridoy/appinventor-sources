@@ -94,6 +94,12 @@ A button that, when clicked on, displays a list of the contacts to choose among.
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
 
+{:id="ContactPicker.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="ContactPicker.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
+
 {:id="ContactPicker.PhoneNumber" .text .ro .bo} *PhoneNumber*
 : Returns the primary phone number associated with the selected contact, or the empty string if
  no phone number is associated with the contact.
@@ -240,6 +246,12 @@ An `EmailPicker` is a kind of text box. If the user begins entering the name or 
 {:id="EmailPicker.Left" .number} *Left*
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
+
+{:id="EmailPicker.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="EmailPicker.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="EmailPicker.Text" .text} *Text*
 : The text in the `EmailPicker`, which can be set by the programmer in the Designer or Blocks Editor,
@@ -437,6 +449,12 @@ A button that, when clicked on, displays a list of the contacts' phone numbers t
 {:id="PhoneNumberPicker.Left" .number} *Left*
 : Specifies the position of the Left edge of the component relative to an
  AbsoluteArrangement.
+
+{:id="PhoneNumberPicker.Margin" .text .do} *Margin*
+: Specifies the margin space outside the component's bounds (Top,Left,Right,Bottom).
+
+{:id="PhoneNumberPicker.Padding" .text .do} *Padding*
+: Specifies the padding space inside the component's bounds (Top,Left,Right,Bottom).
 
 {:id="PhoneNumberPicker.PhoneNumber" .text .ro .bo} *PhoneNumber*
 : Returns the primary phone number associated with the selected contact, or the empty string if
