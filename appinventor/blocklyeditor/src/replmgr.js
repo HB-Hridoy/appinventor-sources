@@ -25,6 +25,7 @@ goog.require('AI.Yail');  // must be first
 goog.require('AI.Yail.color');
 goog.require('AI.Yail.componentblock');
 goog.require('AI.Yail.control');
+goog.require('AI.Yail.constants');
 goog.require('AI.Yail.dictionaries');
 goog.require('AI.Yail.helpers');
 goog.require('AI.Yail.lists');
@@ -264,6 +265,7 @@ Blockly.ReplMgr.buildYail = function(workspace, opt_force) {
         }
         if (block.blockType != "event" &&
             block.type != "global_declaration" &&
+            block.type != "constant_group_declaration" &&
             block.type != "procedures_defnoreturn" &&
             block.type != "procedures_defreturn")
             continue;

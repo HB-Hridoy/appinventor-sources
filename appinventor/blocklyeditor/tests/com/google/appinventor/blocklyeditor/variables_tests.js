@@ -403,4 +403,104 @@ suite('Variables', function() {
     chai.assert.equal(declarationBlock.getFieldValue('VAR0'), 'myVar');
     chai.assert.isNull(declarationBlock.getField('VAR1'));
   });
+
+  suite('Constants', function() {
+    function appendGroup(group, entries) {
+      return Blockly.serialization.blocks.append({
+        type: 'constant_group_declaration', fields: { GROUP: group },
+        inputs: { CONSTANTS: { block: entries } }
+      }, workspace);
+    }
+
+    function entry(name, value, next) {
+      const json = {
+        type: 'constant_group_entry', fields: { NAME: name },
+        inputs: { VALUE: { block: { type: 'math_number', fields: { NUM: value } } } }
+      };
+      if (next) {
+        json.next = { block: next };
+      }
+      return json;
+    }
+
+    test('getter can read a constant of its group', function() {
+      appendGroup('API', entry('VERSION', 3));
+      const getBlock = Blockly.serialization.blocks.append({
+        type: 'constant_group_get', fields: { GROUP: 'API', CONSTANT: 'VERSION' }
+      }, workspace);
+      workspace.getWarningHandler().checkAllBlocksForWarningsAndErrors();
+      chai.assert.isNotTrue(getBlock.hasError);
+    });
+
+    test('getter for a constant that is not in the group is an error', function() {
+      appendGroup('API', entry('VERSION', 3));
+      appendGroup('COLORS', entry('PRIMARY', 1));
+      const getBlock = Blockly.serialization.blocks.append({
+        type: 'constant_group_get', fields: { GROUP: 'COLORS', CONSTANT: 'VERSION' }
+      }, workspace);
+      workspace.getWarningHandler().checkAllBlocksForWarningsAndErrors();
+      chai.assert.isTrue(getBlock.hasError);
+    });
+
+    test('constants are not exposed to the variable getter', function() {
+      appendGroup('API', entry('VERSION', 3));
+      const getBlock = Blockly.serialization.blocks.append({
+        type: 'lexical_variable_get', fields: { VAR: 'global VERSION' }
+      }, workspace);
+      workspace.getWarningHandler().checkAllBlocksForWarningsAndErrors();
+      chai.assert.isTrue(getBlock.hasError);
+    });
+
+    test('duplicate constant name in a group is an error', function() {
+      const group = appendGroup('API', entry('A', 1, entry('A', 2)));
+      workspace.getWarningHandler().checkAllBlocksForWarningsAndErrors();
+      const second = group.getInputTargetBlock('CONSTANTS').getNextBlock();
+      chai.assert.isTrue(second.hasError);
+    });
+
+    test('same constant name in different groups is fine', function() {
+      const a = appendGroup('API', entry('A', 1));
+      const b = appendGroup('COLORS', entry('A', 2));
+      workspace.getWarningHandler().checkAllBlocksForWarningsAndErrors();
+      chai.assert.isNotTrue(a.getInputTargetBlock('CONSTANTS').hasError);
+      chai.assert.isNotTrue(b.getInputTargetBlock('CONSTANTS').hasError);
+    });
+
+    test('duplicate group name is an error', function() {
+      const a = appendGroup('API', entry('A', 1));
+      appendGroup('API', entry('B', 2));
+      workspace.getWarningHandler().checkAllBlocksForWarningsAndErrors();
+      chai.assert.isTrue(a.hasError);
+    });
+
+    test('group generates one definition per constant', function() {
+      const group = appendGroup('API', entry('VERSION', 3));
+      chai.assert.include(AI.Yail.blockToCode(group), '(def c$API$VERSION 3)');
+      const getBlock = Blockly.serialization.blocks.append({
+        type: 'constant_group_get', fields: { GROUP: 'API', CONSTANT: 'VERSION' }
+      }, workspace);
+      chai.assert.include(AI.Yail.blockToCode(getBlock)[0], '(get-var c$API$VERSION)');
+    });
+
+    test('mutator group declaration generates definitions and is read by getter', function() {
+      const block = workspace.newBlock('constant_group_declaration');
+      block.setFieldValue('MATH_CONSTS', 'GROUP');
+      block.updateConstantInputs_(['PI', 'E']);
+      const piVal = workspace.newBlock('math_number');
+      piVal.setFieldValue('3.14159', 'NUM');
+      block.getInput('CONST0').connection.connect(piVal.outputConnection);
+      const eVal = workspace.newBlock('math_number');
+      eVal.setFieldValue('2.71828', 'NUM');
+      block.getInput('CONST1').connection.connect(eVal.outputConnection);
+
+      const yail = AI.Yail.blockToCode(block);
+      chai.assert.include(yail, '(def c$MATH_CONSTS$PI 3.14159)');
+      chai.assert.include(yail, '(def c$MATH_CONSTS$E 2.71828)');
+
+      const getBlock = Blockly.serialization.blocks.append({
+        type: 'constant_group_get', fields: { GROUP: 'MATH_CONSTS', CONSTANT: 'PI' }
+      }, workspace);
+      chai.assert.include(AI.Yail.blockToCode(getBlock)[0], '(get-var c$MATH_CONSTS$PI)');
+    });
+  });
 });

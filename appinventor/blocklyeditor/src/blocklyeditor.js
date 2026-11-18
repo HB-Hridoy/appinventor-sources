@@ -36,6 +36,7 @@ goog.require('AI.Events');
 goog.require('AI.Blocks.mutators');
 goog.require('AI.Blocks.color');
 goog.require('AI.Blocks.components');
+goog.require('AI.Blocks.constants');
 goog.require('AI.Blocks.control');
 goog.require('AI.Blocks.dictionaries');
 goog.require('AI.Blocks.helpers');
@@ -473,6 +474,11 @@ AI.Blockly.ContextMenuItems.registerArrangeOptions = function() {
           let nameB = b.getSvgRoot().textContent;
           nameB = nameB.substring(17, nameB.length - 2);
           res = compareStrTextNum(nameA, nameB);
+        } else if (a.type.indexOf("constant_group_") == 0) {
+          // Constant blocks have no fieldVar_; sort by group and constant name.
+          const constantKey = (blk) => (blk.getFieldValue('GROUP') || '') + '.' +
+              (blk.getFieldValue('CONSTANT') || blk.getFieldValue('NAME') || '');
+          res = compareStrTextNum(constantKey(a), constantKey(b));
         } else {
           let nameA = a.fieldVar_.text_;
           let nameB = b.fieldVar_.text_;

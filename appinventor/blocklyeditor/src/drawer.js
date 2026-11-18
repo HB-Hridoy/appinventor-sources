@@ -679,6 +679,19 @@ Blockly.Drawer.getDefaultXMLString = function(blockType, mutatorAttributes) {
 };
 
 Blockly.Drawer.defaultBlockXMLStrings = {
+  // A new constant group starts with one constant connector already on it.
+  constant_group_declaration: {xmlString:
+  '<xml>' +
+    '<block type="constant_group_declaration">' +
+      '<mutation>' +
+        '<constant name="CONSTANT"></constant>' +
+      '</mutation>' +
+      '<value name="CONST0">' +
+        '<block type="math_number"><field name="NUM">0</field></block>' +
+      '</value>' +
+    '</block>' +
+  '</xml>' },
+
   controls_if: {xmlString:
   '<xml>' +
     '<block type="controls_if">' +

@@ -810,5 +810,442 @@ Blockly.Blocks['local_mutatorarg'] = {
   }
 };
 
+// -*- mode: javascript; js-indent-level: 2; -*-
+// Copyright 2026 MIT, All rights reserved
+// Released under the Apache License, Version 2.0
+// http://www.apache.org/licenses/LICENSE-2.0
+
+/**
+ * @license
+ * @fileoverview Constant blocks for App Inventor.
+ *
+ * Constants are immutable values organised into user-defined groups, much like the
+ * constants of a class:
+ *
+ *   initialize constant group [API]
+ *     constant [BASE_URL] to <value>
+ *     constant [TIMEOUT]  to <value>
+ *
+ *   get constant [API] . [BASE_URL]
+ *
+ * Constants live in their own namespace. They are deliberately NOT global variables:
+ * they never appear in the variable getter/setter dropdowns and there is no setter.
+ */
+
+'use strict';
+
+goog.provide('AI.Blocks.constants');
+
+goog.require('AI.Blockly.FieldNoCheckDropdown');
+
+Blockly.ConstantGroups = {};
+
+/**
+ * Returns the legal form of a group or constant name, or null if the text cannot be
+ * made into one. Names must be legal App Inventor identifiers and must not contain
+ * '$', which is the separator used in the generated code (this keeps generated names
+ * unambiguous).
+ * @param {string} text
+ * @return {?string}
+ */
+Blockly.ConstantGroups.checkName = function(text) {
+  const result = Blockly.LexicalVariable.checkIdentifier(text);
+  if (!result.isLegal || result.transformed.indexOf('$') !== -1) {
+    return null;
+  }
+  return result.transformed;
+};
+
+/**
+ * The workspace holding the declarations that a block should look at. For blocks in a
+ * flyout, this is the workspace the flyout belongs to.
+ * @param {?Blockly.Block} block
+ * @return {?Blockly.Workspace}
+ */
+Blockly.ConstantGroups.getWorkspace = function(block) {
+  let workspace = block && block.workspace;
+  if (workspace && workspace.isFlyout && workspace.targetWorkspace) {
+    workspace = workspace.targetWorkspace;
+  }
+  return workspace || Blockly.common.getMainWorkspace();
+};
+
+/**
+ * Collects the constants declared in a workspace.
+ * @param {?Blockly.Workspace} workspace
+ * @return {!Map<string, !Array<string>>} Map from group name to constant names.
+ */
+Blockly.ConstantGroups.collect = function(workspace) {
+  const groups = new Map();
+  if (!workspace) {
+    return groups;
+  }
+  workspace.getTopBlocks(false).forEach(function(top) {
+    if (top.type !== 'constant_group_declaration' || !top.isEnabled()) {
+      return;
+    }
+    const group = top.getFieldValue('GROUP');
+    if (!groups.has(group)) {
+      groups.set(group, []);
+    }
+    const names = groups.get(group);
+
+    // 1. Dynamic connectors on mutator block: CONST0, CONST1, ...
+    for (let i = 0; top.getInput('CONST' + i); i++) {
+      const name = top.getFieldValue('NAME' + i);
+      if (name && names.indexOf(name) === -1) {
+        names.push(name);
+      }
+    }
+
+    // 2. If inputs haven't been rendered yet but constantNames_ is set:
+    if (names.length === 0 && top.constantNames_) {
+      top.constantNames_.forEach(function(name) {
+        if (name && names.indexOf(name) === -1) {
+          names.push(name);
+        }
+      });
+    }
+
+    // 3. Fallback: check CONSTANTS statement input (backward compatibility with constant_group_entry)
+    for (let entry = top.getInputTargetBlock('CONSTANTS'); entry; entry = entry.getNextBlock()) {
+      if (entry.type === 'constant_group_entry' && entry.isEnabled()) {
+        const name = entry.getFieldValue('NAME');
+        if (names.indexOf(name) === -1) {
+          names.push(name);
+        }
+      }
+    }
+  });
+  return groups;
+};
+
+/**
+ * Points getters that refer to a renamed group or constant at its new name.
+ * @param {Blockly.Workspace} workspace
+ * @param {string} group The group's current name.
+ * @param {?string} constant The constant's current name, or null to rename the whole group.
+ * @param {string} newName The new name of the group (when constant is null) or constant.
+ */
+Blockly.ConstantGroups.renameGetters = function(workspace, group, constant, newName) {
+  workspace.getAllBlocks(false).forEach(function(block) {
+    if (block.type !== 'constant_group_get' || block.getFieldValue('GROUP') !== group) {
+      return;
+    }
+    if (constant === null) {
+      block.setFieldValue(newName, 'GROUP');
+    } else if (block.getFieldValue('CONSTANT') === constant) {
+      block.setFieldValue(newName, 'CONSTANT');
+    }
+  });
+};
+
+/**
+ * Whether a name change was typed in by the user (as opposed to being set while a
+ * workspace is loading, copied, etc.). Getters are only re-pointed in the former case.
+ * @param {!Blockly.Field} field
+ * @return {boolean}
+ */
+Blockly.ConstantGroups.isUserEdit = function(field) {
+  const block = field.getSourceBlock();
+  return !!(field.isBeingEdited_ && block && !block.isInFlyout);
+};
+
+/**
+ * Validator for the group name field of a group declaration.
+ * @this {Blockly.Field}
+ */
+Blockly.ConstantGroups.groupNameValidator = function(newValue) {
+  const name = Blockly.ConstantGroups.checkName(newValue);
+  if (name === null) {
+    return null;
+  }
+  const oldName = this.getValue();
+  if (name !== oldName && Blockly.ConstantGroups.isUserEdit(this)) {
+    Blockly.ConstantGroups.renameGetters(this.getSourceBlock().workspace, oldName, null, name);
+  }
+  return name;
+};
+
+/**
+ * Validator for the name field of a constant entry.
+ * @this {Blockly.Field}
+ */
+Blockly.ConstantGroups.constantNameValidator = function(newValue) {
+  const name = Blockly.ConstantGroups.checkName(newValue);
+  if (name === null) {
+    return null;
+  }
+  const oldName = this.getValue();
+  if (name !== oldName && Blockly.ConstantGroups.isUserEdit(this)) {
+    const block = this.getSourceBlock();
+    if (block) {
+      if (block.type === 'constant_group_declaration') {
+        Blockly.ConstantGroups.renameGetters(
+            block.workspace, block.getFieldValue('GROUP'), oldName, name);
+      } else if (block.type === 'constant_group_entry') {
+        const group = block.getSurroundParent();
+        if (group && group.type === 'constant_group_declaration') {
+          Blockly.ConstantGroups.renameGetters(
+              block.workspace, group.getFieldValue('GROUP'), oldName, name);
+        }
+      }
+    }
+  }
+  return name;
+};
+
+/**
+ * Dropdown options listing the available groups.
+ * @param {Blockly.Block} block The getter block.
+ * @return {!Array<!Array<string>>}
+ */
+Blockly.ConstantGroups.groupOptions = function(block) {
+  const groups = Array.from(Blockly.ConstantGroups.collect(
+      Blockly.ConstantGroups.getWorkspace(block)).keys()).sort();
+  return groups.length ? groups.map((g) => [g, g]) : [[' ', ' ']];
+};
+
+/**
+ * Dropdown options listing the constants of the group currently chosen on a getter.
+ * @param {Blockly.Block} block The getter block.
+ * @return {!Array<!Array<string>>}
+ */
+Blockly.ConstantGroups.constantOptions = function(block) {
+  const group = block.getFieldValue('GROUP');
+  const names = (Blockly.ConstantGroups.collect(
+      Blockly.ConstantGroups.getWorkspace(block)).get(group) || []).slice().sort();
+  return names.length ? names.map((n) => [n, n]) : [[' ', ' ']];
+};
+
+/**
+ * Validator for the group dropdown of a getter: when another group is picked, switch
+ * the constant dropdown to a constant of that group.
+ * @this {Blockly.Field}
+ */
+Blockly.ConstantGroups.groupChanged = function(newValue) {
+  const block = this.getSourceBlock();
+  const constantField = block && block.getField('CONSTANT');
+  if (constantField) {
+    const names = Blockly.ConstantGroups.collect(
+        Blockly.ConstantGroups.getWorkspace(block)).get(newValue);
+    // Only when the new group is known: while a project is loading the declarations
+    // may not exist yet, and the saved constant must not be thrown away.
+    if (names && names.length && names.indexOf(constantField.getValue()) === -1) {
+      constantField.setValue(names.slice().sort()[0]);
+    }
+  }
+  return newValue;
+};
+
+/**
+ * A group of constants. Holds dynamic constant name-and-value pair inputs using a Mutator.
+ */
+Blockly.Blocks['constant_group_declaration'] = {
+  category: 'Variables',
+  init: function() {
+    this.setColour(Blockly.CONSTANT_CATEGORY_HUE);
+    this.appendDummyInput('HEADER')
+        .appendField(Blockly.Msg.LANG_CONSTANTS_GROUP_DECLARATION_TITLE)
+        .appendField(new Blockly.FieldTextInput(
+            Blockly.Msg.LANG_CONSTANTS_GROUP_DEFAULT_NAME,
+            Blockly.ConstantGroups.groupNameValidator), 'GROUP');
+    this.constantNames_ = [Blockly.Msg.LANG_CONSTANTS_ENTRY_DEFAULT_NAME || 'CONSTANT'];
+    this.updateConstantInputs_(this.constantNames_);
+    this.setMutator(new Blockly.icons.MutatorIcon(['constant_mutatorarg'], this));
+    this.setTooltip(Blockly.Msg.LANG_CONSTANTS_GROUP_DECLARATION_TOOLTIP);
+    this.errors = [
+      {name: 'checkIfDuplicateConstantGroup'},
+      {name: 'checkIfDuplicateConstantName'}
+    ];
+  },
+  onchange: function() {
+    var names = [];
+    for (var i = 0; this.getInput('CONST' + i); i++) {
+      names.push(this.getFieldValue('NAME' + i));
+    }
+    if (names.length > 0) {
+      this.constantNames_ = names;
+    }
+  },
+  mutationToDom: function() {
+    var container = document.createElement('mutation');
+    for (var i = 0; i < this.constantNames_.length; i++) {
+      var parameter = document.createElement('constant');
+      parameter.setAttribute('name', this.constantNames_[i]);
+      container.appendChild(parameter);
+    }
+    return container;
+  },
+  domToMutation: function(xmlElement) {
+    var children = Array.prototype.filter.call(xmlElement.childNodes, function(node) {
+      return node.nodeType === Element.ELEMENT_NODE;
+    });
+    if (children.length > 0) {
+      this.constantNames_ = [];
+      for (var i = 0, childNode; childNode = children[i]; i++) {
+        if (childNode.nodeName.toLowerCase() === 'constant' || childNode.nodeName.toLowerCase() === 'localname') {
+          this.constantNames_.push(childNode.getAttribute('name'));
+        }
+      }
+    }
+    this.updateConstantInputs_(this.constantNames_);
+  },
+  updateConstantInputs_: function(names, inits) {
+    var i = 0;
+    while (this.getInput('CONST' + i)) {
+      this.removeInput('CONST' + i);
+      i++;
+    }
+
+    this.constantNames_ = names;
+
+    for (var j = 0; j < names.length; j++) {
+      var declInput = this.appendValueInput('CONST' + j);
+      declInput.appendField(Blockly.Msg.LANG_CONSTANTS_ENTRY_TITLE || 'constant')
+               .appendField(new Blockly.FieldTextInput(
+                   names[j],
+                   Blockly.ConstantGroups.constantNameValidator), 'NAME' + j)
+               .appendField(Blockly.Msg.LANG_CONSTANTS_ENTRY_TO || 'to')
+               .setAlign(Blockly.inputs.Align.RIGHT);
+      if (inits && inits[j]) {
+        declInput.connection.connect(inits[j]);
+      }
+    }
+  },
+  decompose: function(workspace) {
+    var containerBlock = workspace.newBlock('constant_mutatorcontainer');
+    containerBlock.initSvg();
+    containerBlock.setDefBlock(this);
+    var connection = containerBlock.getInput('STACK').connection;
+    for (var i = 0; i < this.constantNames_.length; i++) {
+      var constName = this.getFieldValue('NAME' + i) || this.constantNames_[i];
+      var argBlock = workspace.newBlock('constant_mutatorarg');
+      argBlock.initSvg();
+      argBlock.setFieldValue(constName, 'NAME');
+      argBlock.oldLocation = i;
+      connection.connect(argBlock.previousConnection);
+      connection = argBlock.nextConnection;
+    }
+    return containerBlock;
+  },
+  compose: function(containerBlock) {
+    var newConstantNames = [];
+    var initializers = [];
+    var mutatorarg = containerBlock.getInputTargetBlock('STACK');
+    while (mutatorarg) {
+      newConstantNames.push(mutatorarg.getFieldValue('NAME'));
+      initializers.push(mutatorarg.valueConnection_);
+      mutatorarg = mutatorarg.nextConnection && mutatorarg.nextConnection.targetBlock();
+    }
+    if (!Blockly.LexicalVariable.stringListsEqual(this.constantNames_, newConstantNames)) {
+      this.updateConstantInputs_(newConstantNames, initializers);
+    }
+  },
+  saveConnections: function(containerBlock) {
+    var argBlock = containerBlock.getInputTargetBlock('STACK');
+    var i = 0;
+    while (argBlock) {
+      var input = this.getInput('CONST' + i);
+      argBlock.valueConnection_ = input && input.connection.targetConnection;
+      i++;
+      argBlock = argBlock.nextConnection && argBlock.nextConnection.targetBlock();
+    }
+  },
+  typeblock: [{translatedName: Blockly.Msg.LANG_CONSTANTS_GROUP_DECLARATION_TITLE}]
+};
+
+Blockly.Blocks['constant_mutatorcontainer'] = {
+  init: function() {
+    this.setColour(Blockly.CONSTANT_CATEGORY_HUE);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.LANG_CONSTANTS_MUTATOR_CONTAINER_TITLE || 'constants');
+    this.appendStatementInput('STACK');
+    this.setTooltip('');
+    this.contextMenu = false;
+  },
+  setDefBlock: function(defBlock) {
+    this.defBlock_ = defBlock;
+  },
+  getDefBlock: function() {
+    return this.defBlock_;
+  },
+  declaredNames: function() {
+    var names = [];
+    var argBlock = this.getInputTargetBlock('STACK');
+    while (argBlock) {
+      names.push(argBlock.getFieldValue('NAME'));
+      argBlock = argBlock.nextConnection && argBlock.nextConnection.targetBlock();
+    }
+    return names;
+  }
+};
+
+Blockly.Blocks['constant_mutatorarg'] = {
+  init: function() {
+    this.setColour(Blockly.CONSTANT_CATEGORY_HUE);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.LANG_CONSTANTS_MUTATOR_ARG_TITLE || 'constant')
+        .appendField(new Blockly.FieldTextInput(
+            Blockly.Msg.LANG_CONSTANTS_ENTRY_DEFAULT_NAME || 'CONSTANT'),
+            'NAME');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('');
+    this.contextMenu = false;
+  }
+};
+
+/**
+ * One constant inside a group: a name and its (fixed) value (for statement-style composition).
+ */
+Blockly.Blocks['constant_group_entry'] = {
+  category: 'Variables',
+  init: function() {
+    this.setColour(Blockly.CONSTANT_CATEGORY_HUE);
+    this.appendValueInput('VALUE')
+        .appendField(Blockly.Msg.LANG_CONSTANTS_ENTRY_TITLE)
+        .appendField(new Blockly.FieldTextInput(
+            Blockly.Msg.LANG_CONSTANTS_ENTRY_DEFAULT_NAME,
+            Blockly.ConstantGroups.constantNameValidator), 'NAME')
+        .appendField(Blockly.Msg.LANG_CONSTANTS_ENTRY_TO);
+    this.setPreviousStatement(true, 'constant_entry');
+    this.setNextStatement(true, 'constant_entry');
+    this.setTooltip(Blockly.Msg.LANG_CONSTANTS_ENTRY_TOOLTIP);
+    this.errors = [{name: 'checkIfDuplicateConstantName'}];
+  },
+  typeblock: [{translatedName: Blockly.Msg.LANG_CONSTANTS_ENTRY_TITLE}]
+};
+
+/**
+ * Reads a constant. Pick the group first, then one of the constants in that group.
+ * There is deliberately no matching setter.
+ */
+Blockly.Blocks['constant_group_get'] = {
+  category: 'Variables',
+  init: function() {
+    const block = this;
+    const groupField = new AI.Blockly.FieldNoCheckDropdown(
+        function() { return Blockly.ConstantGroups.groupOptions(block); },
+        Blockly.ConstantGroups.groupChanged);
+    const constantField = new AI.Blockly.FieldNoCheckDropdown(
+        function() { return Blockly.ConstantGroups.constantOptions(block); });
+    this.setColour(Blockly.CONSTANT_CATEGORY_HUE);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.LANG_CONSTANTS_GET_TITLE)
+        .appendField(groupField, 'GROUP')
+        .appendField('.')
+        .appendField(constantField, 'CONSTANT');
+    this.setOutput(true, null);
+    this.setTooltip(Blockly.Msg.LANG_CONSTANTS_GET_TOOLTIP);
+    this.errors = [
+      {name: 'checkIsInDefinition'},
+      {name: 'checkDropDownContainsValidValue', dropDowns: ['GROUP', 'CONSTANT']}
+    ];
+  },
+  typeblock: [{translatedName: Blockly.Msg.LANG_CONSTANTS_GET_TITLE}]
+};
+
+
 
 

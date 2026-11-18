@@ -375,7 +375,7 @@ Blockly.WarningHandler.prototype["checkIsInDefinition"] = function(block){
     return false;
   }
   var rootBlock = block.getRootBlock();
-  if(rootBlock.type == "global_declaration"){
+  if(rootBlock.type == "global_declaration" || rootBlock.type == "constant_group_declaration"){
     var surroundParent = block;
     while (surroundParent.getSurroundParent()) {
       surroundParent = surroundParent.getSurroundParent();
@@ -390,6 +390,55 @@ Blockly.WarningHandler.prototype["checkIsInDefinition"] = function(block){
   } else {
     return false;
   }
+};
+
+/**
+ * Constant group names must be unique. Flags a group declaration whose name is also
+ * used by another enabled group declaration.
+ */
+Blockly.WarningHandler.prototype['checkIfDuplicateConstantGroup'] = function(block) {
+  var name = block.getFieldValue('GROUP');
+  var duplicate = block.workspace.getTopBlocks(false).some(function(other) {
+    return other !== block && other.type == 'constant_group_declaration' &&
+        other.isEnabled() && other.getFieldValue('GROUP') === name;
+  });
+  if (duplicate) {
+    block.setErrorIconText(Blockly.Msg.ERROR_DUPLICATE_CONSTANT_GROUP);
+    return true;
+  }
+  return false;
+};
+
+/**
+ * Constant names must be unique within their group. Flags a group declaration or entry
+ * whose constant name is duplicated within the same group.
+ */
+Blockly.WarningHandler.prototype['checkIfDuplicateConstantName'] = function(block) {
+  if (block.type === 'constant_group_declaration') {
+    var names = [];
+    for (var i = 0; block.getInput('CONST' + i); i++) {
+      var name = block.getFieldValue('NAME' + i);
+      if (names.indexOf(name) !== -1) {
+        block.setErrorIconText(Blockly.Msg.ERROR_DUPLICATE_CONSTANT_NAME);
+        return true;
+      }
+      names.push(name);
+    }
+    return false;
+  }
+  var group = block.getSurroundParent();
+  if (!group || group.type != 'constant_group_declaration') {
+    return false;
+  }
+  var name = block.getFieldValue('NAME');
+  for (var other = group.getInputTargetBlock('CONSTANTS'); other; other = other.getNextBlock()) {
+    if (other !== block && other.type == 'constant_group_entry' && other.isEnabled() &&
+        other.getFieldValue('NAME') === name) {
+      block.setErrorIconText(Blockly.Msg.ERROR_DUPLICATE_CONSTANT_NAME);
+      return true;
+    }
+  }
+  return false;
 };
 
 // Check if block is undefined and unplug
@@ -798,6 +847,7 @@ Blockly.WarningHandler.prototype['checkEmptySockets'] = function(block){
 Blockly.WarningHandler.prototype['checkBlockAtRoot'] = function(block){
   var rootBlock = block.getRootBlock();
   if(block == rootBlock && block.blockType != "event" && block.type !="global_declaration" &&
+     block.type != "constant_group_declaration" &&
      block.type != "procedures_defnoreturn" && block.type != "procedures_defreturn"){
     if(this.showWarningsToggle) {
       var warningMessage = Blockly.Msg.WRONG_TYPE_BLOCK_WARINGS;
